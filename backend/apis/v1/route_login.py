@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
 
 def authenticate_user(email: str, password: str, db: Session):
@@ -29,7 +29,7 @@ def authenticate_user(email: str, password: str, db: Session):
     return user
 
 
-@router.post("/token", response_model=Token)
+@router.post("/user/login", response_model=Token)
 def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
