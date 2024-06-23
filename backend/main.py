@@ -3,6 +3,7 @@ from core.config import settings
 from db.base import Base
 from db.session import engine
 from fastapi import FastAPI
+from scheduler.jobs import start_scheduler
 
 
 def create_tables():
@@ -17,6 +18,7 @@ def start_application():
     app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
     create_tables()
     include_router(app)
+    start_scheduler()
     return app
 
 
