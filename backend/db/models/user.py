@@ -11,3 +11,4 @@ class User(Base):
     password = Column(String, nullable=False)
     is_superuser = Column(Boolean(), default=False)
     is_active = Column(Boolean(), default=True)
+    is_subscribed = Column(Boolean(), default=False)
