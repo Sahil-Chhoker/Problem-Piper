@@ -1,6 +1,7 @@
 import smtplib
 import ssl
-from email.message import EmailMessage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 import time
 from fastapi import APIRouter, HTTPException
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -9,6 +10,8 @@ from db.session import SessionLocal
 from core.config import settings
 from db.repository.questions import get_a_random_question
 from schemas.questions import Question
+from apscheduler.triggers.cron import CronTrigger
+import pytz
 
 class EmailSender:
     def __init__(self):
@@ -22,11 +25,11 @@ class EmailSender:
 
     def send_email(self, receiver: str, subject: str, body: str):
         try:
-            em = EmailMessage()
+            em = MIMEMultipart("alternative")
             em['From'] = self.email_sender
             em['To'] = receiver
             em['Subject'] = subject
-            em.set_content(body)
+            em.attach(MIMEText(body, "html"))
 
             context = ssl.create_default_context()
             with smtplib.SMTP_SSL(self.smtp_server, self.port, context=context) as smtp:
@@ -52,45 +55,96 @@ def send_email_to_subscribers():
 
     subject = "Today's Question"
     body = f"""
-        <html>
-            <head>
-                <style>
-                    body {{
-                        font-family: Arial, sans-serif;
-                        line-height: 1.6;
-                    }}
-                    .question {{
-                        font-size: 1.2em;
-                        font-weight: bold;
-                        margin-bottom: 10px;
-                    }}
-                    .preview {{
-                        font-style: italic;
-                        margin-bottom: 10px;
-                    }}
-                    .details {{
-                        margin-bottom: 10px;
-                    }}
-                    .link {{
-                        color: #007bff;
-                        text-decoration: none;
-                    }}
-                </style>
-            </head>
-            <body>
-                <div class="question">
-                    Question: {question_data.name}
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Today's Question</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    background-color: #f9f9f9;
+                    padding: 20px;
+                    text-align: center;
+                }}
+                .container {{
+                    background-color: #ffffff;
+                    padding: 20px;
+                    border-radius: 10px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    max-width: 600px;
+                    margin: 0 auto;
+                    text-align: left;
+                }}
+                .header {{
+                    background-color: #007bff;
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 10px 10px 0 0;
+                    font-size: 1.5em;
+                }}
+                .content {{
+                    padding: 20px;
+                }}
+                .question {{
+                    font-size: 1.2em;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                    color: #007bff;
+                }}
+                .preview {{
+                    font-style: italic;
+                    margin-bottom: 10px;
+                }}
+                .details {{
+                    margin-bottom: 10px;
+                }}
+                .link {{
+                    display: inline-block;
+                    background-color: #28a745;
+                    color: white;
+                    padding: 10px 20px;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    margin-top: 20px;
+                }}
+                .link:hover {{
+                    background-color: #218838;
+                }}
+                .footer {{
+                    margin-top: 20px;
+                    font-size: 0.9em;
+                    color: #555;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    Daily Coding Question
                 </div>
-                <div class="preview">
-                    Preview: {question_data.preview}
+                <div class="content">
+                    <div class="question">
+                        {question_data.name}
+                    </div>
+                    <div class="preview">
+                        {question_data.preview}
+                    </div>
+                    <div class="details">
+                        <p><strong>Difficulty:</strong> {question_data.difficulty_name}</p>
+                        <p><strong>Max Score:</strong> {question_data.max_score}</p>
+                        <p><strong>Success Ratio:</strong> {question_data.success_ratio}</p>
+                    </div>
+                    <a class="link" href="{question_data.link}" target="_blank">Solve Challenge</a>
                 </div>
-                <div class="details">
-                    <p>Difficulty: {question_data.difficulty_name}</p>
-                    <p>Max Score: {question_data.max_score}</p>
-                    <p>Success Ratio: {question_data.success_ratio}</p>
-                    <p>Link: <a class="link" href="{question_data.link}" target="_blank">{question_data.link}</a></p>
+                <div class="footer">
+                    Happy coding,<br>
+                    The Coding Challenge Team
                 </div>
-            </body>
+            </div>
+        </body>
         </html>
     """
 
@@ -101,8 +155,17 @@ def send_email_to_subscribers():
     finally:
         db.close()
 
+# Initialize the scheduler
 scheduler = BackgroundScheduler()
-scheduler.add_job(send_email_to_subscribers, 'interval', seconds=30)
+
+# Define the IST timezone
+ist = pytz.timezone('Asia/Kolkata')
+
+# Schedule the job to run every day at 9:30 AM IST
+scheduler.add_job(
+    send_email_to_subscribers, 
+    CronTrigger(hour=22, minute=5, timezone=ist)
+)
 
 @router.on_event("startup")
 async def startup_event():
