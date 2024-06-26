@@ -22,9 +22,8 @@ class Settings:
     ALGORITHM = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-    SENDER_EMAIL = os.getenv('SENDER_EMAIL')
-    EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
-    if not EMAIL_PASSWORD:
-        raise ValueError("Email password not found in environment variables.")
+    SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+    EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+
 
 settings = Settings()
