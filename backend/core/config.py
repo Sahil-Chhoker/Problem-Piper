@@ -6,7 +6,7 @@ load_dotenv()
 
 
 class Settings:
-    PROJECT_NAME: str = "Hacker Rank Bot"
+    PROJECT_NAME: str = "Problem Piper"
     PROJECT_VERSION: str = "1.0.0"
 
     POSTGRES_USER: str = os.getenv("POSTGRES_USER")
