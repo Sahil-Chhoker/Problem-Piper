@@ -175,19 +175,16 @@ def send_email_to_subscribers():
 # Initialize the scheduler
 scheduler = BackgroundScheduler()
 
-# Define the IST timezone
-ist = pytz.timezone('Asia/Kolkata')
+# Default time to fallback if not provided by user
+default_hour = 22
+default_minute = 5
 
-# Schedule the job to run every day at 9:30 AM IST
-scheduler.add_job(
-    send_email_to_subscribers, 
-    CronTrigger(hour=22, minute=5, timezone=ist)
-)
+def configure_email_sending_time(hour: int = default_hour, minute: int = default_minute):
+    # Define the IST timezone
+    ist = pytz.timezone('Asia/Kolkata')
 
-@router.on_event("startup")
-async def startup_event():
-    scheduler.start()
-
-@router.on_event("shutdown")
-async def shutdown_event():
-    scheduler.shutdown()
+    # Schedule the job to run every day at the specified hour and minute in IST
+    scheduler.add_job(
+        send_email_to_subscribers, 
+        CronTrigger(hour=hour, minute=minute, timezone=ist))
+    
