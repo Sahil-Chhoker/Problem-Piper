@@ -13,6 +13,11 @@ router = APIRouter()
 
 @router.get("/questions/random", response_model=Question, status_code=status.HTTP_200_OK)
 async def get_random_question(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+        )
     question = get_a_random_question(db=db)
     return question
 

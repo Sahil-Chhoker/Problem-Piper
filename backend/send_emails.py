@@ -41,6 +41,72 @@ class EmailSender:
                 self.send_email(receiver, subject, body)
             else:
                 raise HTTPException(status_code=500, detail="Failed to send email.")
+            
+    def send_welcome_email(self, receiver: str):
+        subject = "Welcome to Our Service!"
+        body = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Welcome</title>
+            <style>
+                body {
+                    font-family: 'Arial', sans-serif;
+                    line-height: 1.6;
+                    background-color: #f0f4f8;
+                    margin: 0;
+                    padding: 0;
+                }
+                .container {
+                    max-width: 600px;
+                    margin: 20px auto;
+                    background-color: #ffffff;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+                }
+                .header {
+                    background-color: #4a90e2;
+                    color: white;
+                    padding: 20px;
+                    text-align: center;
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+                .content {
+                    padding: 30px;
+                    text-align: center;
+                }
+                .footer {
+                    margin-top: 30px;
+                    text-align: center;
+                    color: #7f8c8d;
+                    font-size: 14px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    Welcome to Our Service!
+                </div>
+                <div class="content">
+                    <p>Thank you for subscribing to our service. We are excited to have you on board!</p>
+                    <p>Stay tuned for daily updates and challenges.</p>
+                    <p>Happy coding!</p>
+                    <p>The Problem Piper Team</p>
+                </div>
+                <div class="footer">
+                    <p>© 2024 The Problem Piper Team. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        self.send_email(receiver, subject, body)
+
 
 router = APIRouter()
 email_sender = EmailSender()
@@ -172,19 +238,13 @@ def send_email_to_subscribers():
     finally:
         db.close()
 
-# Initialize the scheduler
 scheduler = BackgroundScheduler()
+default_hour = 9
+default_minute = 15
 
-# Default time to fallback if not provided by user
-default_hour = 22
-default_minute = 5
-
-def configure_email_sending_time(hour: int = default_hour, minute: int = default_minute):
-    # Define the IST timezone
+def configure_email_sending_time():
     ist = pytz.timezone('Asia/Kolkata')
-
-    # Schedule the job to run every day at the specified hour and minute in IST
     scheduler.add_job(
         send_email_to_subscribers, 
-        CronTrigger(hour=hour, minute=minute, timezone=ist))
+        CronTrigger(hour=default_hour, minute=default_minute, timezone=ist))
     
