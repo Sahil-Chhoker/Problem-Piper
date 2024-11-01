@@ -41,72 +41,6 @@ class EmailSender:
                 self.send_email(receiver, subject, body)
             else:
                 raise HTTPException(status_code=500, detail="Failed to send email.")
-            
-    def send_welcome_email(self, receiver: str):
-        subject = "Welcome to Our Service!"
-        body = """
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Welcome</title>
-            <style>
-                body {
-                    font-family: 'Arial', sans-serif;
-                    line-height: 1.6;
-                    background-color: #f0f4f8;
-                    margin: 0;
-                    padding: 0;
-                }
-                .container {
-                    max-width: 600px;
-                    margin: 20px auto;
-                    background-color: #ffffff;
-                    border-radius: 8px;
-                    overflow: hidden;
-                    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-                }
-                .header {
-                    background-color: #4a90e2;
-                    color: white;
-                    padding: 20px;
-                    text-align: center;
-                    font-size: 24px;
-                    font-weight: bold;
-                }
-                .content {
-                    padding: 30px;
-                    text-align: center;
-                }
-                .footer {
-                    margin-top: 30px;
-                    text-align: center;
-                    color: #7f8c8d;
-                    font-size: 14px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    Welcome to Our Service!
-                </div>
-                <div class="content">
-                    <p>Thank you for subscribing to our service. We are excited to have you on board!</p>
-                    <p>Stay tuned for daily updates and challenges.</p>
-                    <p>Happy coding!</p>
-                    <p>The Problem Piper Team</p>
-                </div>
-                <div class="footer">
-                    <p>© 2024 The Problem Piper Team. All rights reserved.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-        self.send_email(receiver, subject, body)
-
 
 router = APIRouter()
 email_sender = EmailSender()
@@ -122,111 +56,54 @@ def send_email_to_subscribers():
     subject = "Today's Question"
     body = f"""
         <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Today's Coding Question</title>
-            <style>
-                body {{
-                    font-family: 'Arial', sans-serif;
-                    line-height: 1.6;
-                    background-color: #f0f4f8;
-                    margin: 0;
-                    padding: 0;
-                }}
-                .container {{
-                    max-width: 600px;
-                    margin: 20px auto;
-                    background-color: #ffffff;
-                    border-radius: 8px;
-                    overflow: hidden;
-                    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-                }}
-                .header {{
-                    background-color: #4a90e2;
-                    color: white;
-                    padding: 20px;
-                    text-align: center;
-                    font-size: 24px;
-                    font-weight: bold;
-                }}
-                .content {{
-                    padding: 30px;
-                }}
-                .question {{
-                    font-size: 20px;
-                    font-weight: bold;
-                    margin-bottom: 15px;
-                    color: #2c3e50;
-                }}
-                .preview {{
-                    font-style: italic;
-                    margin-bottom: 20px;
-                    color: #34495e;
-                    background-color: #ecf0f1;
-                    padding: 15px;
-                    border-radius: 5px;
-                }}
-                .details {{
-                    background-color: #f9f9f9;
-                    padding: 15px;
-                    border-radius: 5px;
-                    margin-bottom: 20px;
-                }}
-                .details p {{
-                    margin: 5px 0;
-                    color: #2c3e50;
-                }}
-                .details strong {{
-                    color: #3498db;
-                }}
-                .link {{
-                    display: inline-block;
-                    background-color: #2ecc71;
-                    color: white;
-                    padding: 12px 25px;
-                    text-decoration: none;
-                    border-radius: 5px;
-                    font-weight: bold;
-                    text-align: center;
-                    transition: background-color 0.3s ease;
-                }}
-                .link:hover {{
-                    background-color: #27ae60;
-                }}
-                .footer {{
-                    margin-top: 30px;
-                    text-align: center;
-                    color: #7f8c8d;
-                    font-size: 14px;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    Daily Coding Challenge
+        <html>
+        <body style="font-family: system-ui, -apple-system, sans-serif; display: flex; justify-content: center; background-color: #f0f2f5; padding: 20px;">
+        <div style="background: white; border-radius: 8px; width: 100%; max-width: 800px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <!-- Header -->
+            <div style="background: #1a56db; color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">🏆</span>
+                <span style="font-size: 20px; font-weight: 600;">Daily Coding Challenge</span>
+            </div>
+            <span style="background: #fbbf24; color: #000; padding: 4px 12px; border-radius: 16px; font-size: 14px; font-weight: 500;">{question_data.difficulty_name}</span>
+            </div>
+
+            <!-- Content -->
+            <div style="padding: 24px;">
+            <h2 style="margin: 0 0 16px 0; font-size: 24px; color: #111827;">{question_data.name}</h2>
+            
+            <p style="margin: 0 0 24px 0; color: #4b5563; line-height: 1.5;">
+                {question_data.preview}
+            </p>
+
+            <!-- Stats Grid -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: #fbbf24; font-size: 20px;">⭐</span>
+                <span style="color: #4b5563;">Score: {question_data.max_score}</span>
                 </div>
-                <div class="content">
-                    <div class="question">
-                        {question_data.name}
-                    </div>
-                    <div class="preview">
-                        {question_data.preview}
-                    </div>
-                    <div class="details">
-                        <p><strong>Difficulty:</strong> {question_data.difficulty_name}</p>
-                        <p><strong>Max Score:</strong> {question_data.max_score}</p>
-                        <p><strong>Success Ratio:</strong> {question_data.success_ratio}</p>
-                    </div>
-                    <a class="link" href="{question_data.link}" target="_blank">Solve Challenge</a>
-                </div>
-                <div class="footer">
-                    Happy coding!<br>
-                    The Coding Challenge Team
+                <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: #60a5fa; font-size: 20px;">👥</span>
+                <span style="color: #4b5563;">Success: {round(question_data.success_ratio, 2)}</span>
                 </div>
             </div>
+
+            <!-- Tags -->
+            <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+                {question_data.skill if question_data.skill else ""}
+            </div>
+
+            <!-- Button -->
+            <a href="{question_data.link}" style="width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+                Solve Challenge →
+            </a>
+
+            <!-- Footer -->
+            <p style="text-align: center; margin: 24px 0 0 0; color: #6b7280;">
+                Happy coding! - The Problem Piper Team
+            </p>
+            </div>
+        </div>
         </body>
         </html>
         """
@@ -240,7 +117,7 @@ def send_email_to_subscribers():
 
 scheduler = BackgroundScheduler()
 default_hour = 9
-default_minute = 15
+default_minute = 30
 
 def configure_email_sending_time():
     ist = pytz.timezone('Asia/Kolkata')
