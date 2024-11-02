@@ -89,6 +89,7 @@ export default function SignupPage() {
     
     setIsLoading(true);
     localStorage.setItem("userName", formData.name);
+    localStorage.setItem("userEmail", formData.email);
 
     const apiRequestData = {
       email: formData.email,

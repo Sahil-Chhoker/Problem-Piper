@@ -9,17 +9,49 @@ const Dashboard = () => {
   const { toast } = useToast();
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [user, setUsername] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const subscriptionStatus = localStorage.getItem("subsciption_status");
-    const user = localStorage.getItem("userName");
+    const username = localStorage.getItem("userName");
+    const userEmail = localStorage.getItem("userEmail");
+
     if (subscriptionStatus === "Subscribed") {
       setIsSubscribed(true);
     }
-    if (user) {
-      setUsername(user);
+    if (username) {
+      setUsername(username);
+    }
+    if (userEmail) {
+      setEmail(userEmail);
     }
   }, []);
+
+  async function sendWelcomeEmail() {
+    try {
+      const response = await fetch("/api/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          username: user,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send welcome email");
+      }
+    } catch (error) {
+      console.error("Error sending welcome email:", error);
+      toast({
+        title: "Email Error",
+        description: "Failed to send welcome email. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }
 
   async function subscribe() {
     try {
@@ -39,15 +71,13 @@ const Dashboard = () => {
         localStorage.setItem("subsciption_status", "Subscribed");
         setIsSubscribed(true);
 
-        let data;
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          data = await response.json();
-        }
+        // Send welcome email after successful subscription
+        await sendWelcomeEmail();
 
         toast({
           title: "Successfully Subscribed",
-          description: "Thanks for subscribing!!",
+          description:
+            "Thanks for subscribing!",
           variant: "default",
         });
       } else {
@@ -66,12 +96,11 @@ const Dashboard = () => {
       console.error("Subscription error:", error);
     }
   }
-
   async function unsubscribe() {
     try {
       const accessToken = localStorage.getItem("access_token");
       const response = await fetch(
-       `${process.env.NEXT_PUBLIC_GATEWAY_ENDPOINT}/unsubscribe`,
+        `${process.env.NEXT_PUBLIC_GATEWAY_ENDPOINT}/unsubscribe`,
         {
           method: "GET",
           headers: {
