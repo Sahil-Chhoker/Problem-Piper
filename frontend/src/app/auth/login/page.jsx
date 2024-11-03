@@ -50,6 +50,7 @@ export default function LoginPage() {
       if (response.ok) {
         // Store the access token in localStorage
         localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("userEmail", formData.username);
 
         // Show success toast
         toast({
