@@ -7,7 +7,7 @@ load_dotenv()
 
 class Settings:
     PROJECT_NAME: str = "Problem Piper"
-    PROJECT_VERSION: str = "1.5.0"
+    PROJECT_VERSION: str = "2.0.0"
 
     DATABASE_URL = os.getenv("DATABASE_URL")
     SECRET_KEY: str = os.getenv("SECRET_KEY")
